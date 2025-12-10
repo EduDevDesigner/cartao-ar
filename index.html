@@ -86,14 +86,9 @@
    
 
     <!-- Cena AR -->
-    <a-scene mindar-image="imageTargetSrc: Imagens/targets.mind; filterMinCF: 0.0001; 
-              filterBeta: 0.05;
-              missTolerance: 5;
-              warmupTolerance: 4;" 
-             color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights" 
-             xr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false">
+    <a-scene mindar-image="imageTargetSrc: Imagens/targets.mind; autoStart: false; uiLoading: yes; uiError: yes; uiScan: yes;" 
+             embedded color-space="sRGB" xr-mode-ui="enabled: false" renderer="antialias: true;" 
+             device-orientation-permission-ui="enable:false">
 
       <!-- Assets: imagens do cartão e dos ícones + modelo glTF (placeholder) -->
       <a-assets>
