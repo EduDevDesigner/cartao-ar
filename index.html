@@ -1,182 +1,221 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Início</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cartão de Visita AR — MindAR + A-Frame</title>
+  <style>
+    html, body { height: 100%; margin: 0; font-family: Arial, Helvetica, sans-serif; background: #111; color: #fff }
+    #app { width: 100%; height: 100%; position: relative }
 
-<!-- Font Awesome (Instagram, Facebook, WhatsApp) -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    /* simples HUD (botões na tela) */
+    .hud {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 12px;
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+    }
+    .btnImg {
+      width: 64px;
+      height: 64px;
+      cursor: pointer;
+      border-radius: 10px;
+      object-fit: contain;
+      background: rgba(0,0,0,0.4);
+      padding: 6px;
+      backdrop-filter: blur(6px);
+    }
+    .btnImg:active { transform: scale(0.95) }
+    .btn {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+    }
+    .btn:active { transform: translateY(1px) }
 
-<style>
-  :root{
-    --instagram: #E1306C;
-    --facebook: #1877F2;
-    --x-bg: #000;
-    --x-fill: #fff;
-  }
+    /* instrução pequena no topo */
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: rgba(0,0,0,0.45);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #fff;
+    }
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: 'Orbitron', sans-serif;
-    background: #000;
-    color: #fff;
-  }
-
-  /* Fundo geral */
-  .background-container {
-    position: fixed;
-    inset: 0;
-    background-image: url('Imagens/Fundo_Final.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    transform: scale(1.03);
-    z-index: 0;
-  }
-
-  /* Container principal */
-  .container {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-  }
-  
-  /* Botões na frente da imagem */
-  .buttons-container {
-    position: absolute;
-    top: 65%;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    z-index: 4;
-  }
-
-  .card {
-    position: relative;
-    cursor: pointer;
-    width: 220px;
-    border: none;
-    background: transparent;
-    border-radius: 0px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 0 18px rgba(103, 255, 255, 0.6),
-                0 0 30px rgba(0,255,255,0.3) inset;
-    animation: glowBtn 2.8s ease-in-out infinite alternate;
-    transition: transform 0.25s ease;
-  }
-  .card img { width: 100%; height:auto; display:block; border-radius:0px; }
-  .card:hover { transform: scale(1.06); }
-
-  @keyframes glowBtn {
-    0%   { box-shadow: 0 0 16px rgba(252, 226, 167, 0.5); }
-    50%  { box-shadow: 0 0 30px rgba(255, 223, 155, 0.8); }
-    100% { box-shadow: 0 0 16px rgba(166, 170, 170, 0.5); }
-  }
-
-  /* Redes sociais — agora na horizontal, embaixo e menores */
-  .social-icons {
-    position: fixed;
-    bottom: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: row;
-    gap: 18px;
-    z-index: 10;
-  }
-
-  .social-icons a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;   /* menor */
-    height: 38px;  /* menor */
-    border-radius: 50%;
-    text-decoration: none;
-    transition: transform .18s ease, box-shadow .18s ease;
-    border: 2px solid white;
-    box-shadow: 0 0 10px rgba(255,255,255,0.5);
-  }
-
-  .social-icons a.instagram {
-    background: radial-gradient(circle at 30% 20%, #feda75 0%, #fa7e1e 20%, #d62976 50%, #962fbf 70%, #4f5bd5 100%);
-  }
-  .social-icons a.instagram i { color: #fff; font-size:17px; }
-
-  .social-icons a.facebook { background: var(--facebook); }
-  .social-icons a.facebook i { color: #fff; font-size:17px; }
-
-  /* WHATSAPP NOVO NO LUGAR DO X */
-  .social-icons a.whatsapp {
-    background: #25D366;
-  }
-  .social-icons a.whatsapp i {
-    color: #fff;
-    font-size: 18px;
-  }
-
-  .social-icons a:hover {
-    transform: scale(1.12);
-    box-shadow: 0 14px 28px rgba(255,255,255,0.6);
-  }
-
-  /* Responsividade */
-  @media (max-width:768px) {
-    .card { width: 200px; }
-  }
-
-  @media (max-width:480px) {
-    .card { width: 160px; }
-  }
-</style>
+    /* esconder o canvas de fallback do A-Frame quando não precisar mostrar */
+    a-scene { width: 100%; height: 100% }
+  </style>
+  <!-- A-Frame + MindAR (CDNs) -->
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image-aframe.prod.js"></script>
 </head>
 <body>
+  <div id="app">
 
-  <!-- Fundo animado -->
-  <div class="background-container" aria-hidden="true"></div>
+    <div id="info">Aponte a câmera para o QR Code (use o arquivo <code>targets.mind</code> gerado a partir do QR).<br>Toque em "Iniciar AR" se solicitado.</div>
 
-  <div class="container">   
-    <div class="buttons-container">
-      <button class="card" onclick="location.href='vinhos.html'">
-        <img src="Imagens/btn_iniciar.png" alt="Iniciar">
-      </button>
+    <!-- HUD (botões HTML sobre o canvas, agora como imagens) -->
+    <div class="hud">
+      <img id="startBtn" class="btnImg" src="btn-start.png" alt="Iniciar AR" />
+      <img id="playVoiceBtn" class="btnImg" src="btn-voice.png" alt="Ouvir apresentação" />
+      <img id="downloadTarget" class="btnImg" src="btn-download.png" alt="Baixar targets" />
     </div>
-  </div>
 
-  <!-- Redes sociais com WHATSAPP -->
-  <div class="social-icons">
-    <a class="instagram" href="https://www.instagram.com" target="_blank" aria-label="Instagram">
-      <i class="fab fa-instagram"></i>
-    </a>
+    <!-- Áudio da apresentação (substitua pelo seu arquivo) -->
+    <audio id="voiceAudio" src="voice.mp3" preload="auto"></audio>
 
-    <a class="facebook" href="https://www.facebook.com" target="_blank" aria-label="Facebook">
-      <i class="fab fa-facebook-f"></i>
-    </a>
+    <!-- A-Frame + MindAR scene -->
+    <a-scene mindar-image="imageTargetSrc: targets.mind; autoStart: false; uiLoading: yes; uiError: yes; uiScan: yes;" embedded color-space="sRGB" vr-mode-ui="enabled: false" renderer="antialias: true;" device-orientation-permission-ui="enable:false">
 
-    <a class="whatsapp" href="https://wa.me/seunumeroaqui" target="_blank" aria-label="WhatsApp">
-      <i class="fab fa-whatsapp"></i>
-    </a>
+      <!-- câmera padrão exigida pelo MindAR -->
+      <a-entity camera="fov: 45; active: true"
+                position="0 0 0"></a-entity>
+
+      <!-- Assets: imagens do cartão e dos ícones + modelo glTF (placeholder) -->
+      <a-assets>
+        <!-- Substitua os src pelos seus arquivos reais -->
+        <img id="cardImg" src="card-placeholder.png" crossorigin="anonymous" />
+        <img id="instaIcon" src="instagram.png" crossorigin="anonymous" />
+        <img id="fbIcon" src="facebook.png" crossorigin="anonymous" />
+        <img id="waIcon" src="whatsapp.png" crossorigin="anonymous" />
+
+        <!-- Modelo glTF de exemplo - substitua por um modelo de casa real -->
+        <a-asset-item id="houseModel" src="house.gltf"></a-asset-item>
+      </a-assets>
+
+      <!-- Target (índice 0). Tudo dentro desse <a-entity> aparece quando o target é detectado -->
+      <a-entity mindar-image-target="targetIndex: 0">
+
+        <!-- Cartão (plano) -->
+        <a-plane id="cardPlane"
+                 position="0 0 0"
+                 rotation="-90 0 0"
+                 width="1.2"
+                 height="0.7"
+                 material="shader: flat; src: #cardImg; transparent: true">
+        </a-plane>
+
+        <!-- Casa 3D acima do cartão -->
+        <a-entity id="houseEntity"
+                  gltf-model="#houseModel"
+                  position="0 0.45 0"
+                  rotation="0 180 0"
+                  scale="0.25 0.25 0.25"
+                  animation__pop="property: scale; to: 0.28 0.28 0.28; dur: 800; dir: alternate; loop: true; easing: easeInOutSine">
+        </a-entity>
+
+        <!-- Ícones das redes sociais abaixo do cartão (cada um é um plano clicável) -->
+        <a-entity id="socials" position="0 -0.6 0">
+
+          <a-plane id="insta" class="socialIcon" position="-0.5 0 0"
+                   width="0.3" height="0.3" rotation="-90 0 0"
+                   material="shader: flat; src: #instaIcon; transparent: true">
+          </a-plane>
+
+          <a-plane id="facebook" class="socialIcon" position="0 0 0"
+                   width="0.3" height="0.3" rotation="-90 0 0"
+                   material="shader: flat; src: #fbIcon; transparent: true">
+          </a-plane>
+
+          <a-plane id="whatsapp" class="socialIcon" position="0.5 0 0"
+                   width="0.3" height="0.3" rotation="-90 0 0"
+                   material="shader: flat; src: #waIcon; transparent: true">
+          </a-plane>
+
+        </a-entity>
+
+      </a-entity>
+
+    </a-scene>
+
   </div>
 
   <script>
-    function sairPagina() {
-      window.close();
-      window.location.href = "about:blank";
-    }
-  </script>
+    // ==== OBSERVAÇÕES IMPORTANTES (leia e adapte) ====
+    // 1) O MindAR usa um arquivo "targets.mind" (binário) gerado a partir da imagem alvo.
+    //    Para usar um QR Code como ativador, gere um arquivo targets.mind com a imagem do QR Code
+    //    (use a ferramenta oficial do MindAR: https://hiukim.github.io/mind-ar-js-docs/tools/ ou o utilitário CLI).
+    // 2) Substitua os arquivos em <a-assets> (card-placeholder.png, instagram.png, facebook.png, whatsapp.png, house.gltf, voice.mp3)
+    //    pelos seus próprios recursos.
+    // 3) Teste em um servidor (localhost). Muitos navegadores exigem https/localhost para acessar a câmera.
 
+    document.addEventListener('DOMContentLoaded', () => {
+      const startBtn = document.getElementById('startBtn');
+      const playVoiceBtn = document.getElementById('playVoiceBtn');
+      const voiceAudio = document.getElementById('voiceAudio');
+      const sceneEl = document.querySelector('a-scene');
+      const mindarComponent = sceneEl.components['mindar-image'];
+
+      // fallback: se o componente ainda não estiver carregado, espere
+      function startMindAR() {
+        if (!sceneEl || !sceneEl.components || !sceneEl.components['mindar-image']) {
+          console.warn('MindAR não está pronto. Tentando novamente em 300ms');
+          setTimeout(startMindAR, 300);
+          return;
+        }
+        sceneEl.components['mindar-image'].start();
+      }
+
+      startBtn.addEventListener('click', () => {
+        startMindAR();
+      });
+
+      // Reproduz a voz ao tocar no botão. Também pausará se já estiver tocando.
+      playVoiceBtn.addEventListener('click', () => {
+        if (voiceAudio.paused) {
+          voiceAudio.play().catch(err => console.warn('Erro ao reproduzir áudio:', err));
+          playVoiceBtn.textContent = 'Pausar apresentação';
+        } else {
+          voiceAudio.pause();
+          playVoiceBtn.textContent = 'Ouvir apresentação';
+        }
+      });
+
+      // Ações de clique para os ícones sociais. Em dispositivos móveis, use touchend em vez de click se necessário.
+      // Altere os links para suas redes reais.
+      const insta = document.getElementById('insta');
+      const fb = document.getElementById('facebook');
+      const wa = document.getElementById('whatsapp');
+
+      function openLink(url) {
+        // abrir em nova aba (fora do contexto do AR)
+        window.open(url, '_blank');
+      }
+
+      insta.addEventListener('click', () => openLink('https://www.instagram.com/seu_usuario'));
+      fb.addEventListener('click', () => openLink('https://www.facebook.com/seu_usuario'));
+      wa.addEventListener('click', () => openLink('https://wa.me/5511999999999?text=Ol%C3%A1'));
+
+      // Para facilitar testes em desktop (onde pode não existir câmera), oferecemos um download de exemplo
+      document.getElementById('downloadTarget').addEventListener('click', () => {
+        alert('Este botão é um espaço reservado. Para gerar targets.mind, use a ferramenta de criação de alvos do MindAR com sua imagem de QR Code.');
+      });
+
+      // Quando o target é perdido/encontrado, você pode conectar eventos se quiser (ex.: animações, pause, etc.)
+      const targetEntity = document.querySelector('[mindar-image-target]');
+      if (targetEntity) {
+        targetEntity.addEventListener('targetFound', () => {
+          console.log('Target encontrado');
+        });
+        targetEntity.addEventListener('targetLost', () => {
+          console.log('Target perdido');
+        });
+      }
+
+    });
+  </script>
 </body>
 </html>
