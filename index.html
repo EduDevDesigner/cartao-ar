@@ -1,146 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
-    <title>Cartão</title>
+    <title></title>   
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="style.css">
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-    <style>
-      /* 🔹 Botão de Descrição */
-      #btn-desc {
-        position: fixed;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0,0,0,0.6);
-        color: #fff;
-        border: 1px solid #fff;
-        padding: 10px 16px;
-        border-radius: 6px;
-        font-size: 15px;
-        cursor: pointer;
-        z-index: 9999;
-        display: none;
-      }
-
-      /* 🔹 Painel */
-      #painel-desc {
-        position: fixed;
-        right: 0;
-        top: 0;
-        width: 70%;
-        height: 100%;
-        background: rgba(0,0,0,0.88);
-        color: white;
-        padding: 20px;
-        z-index: 10000;
-        display: none;
-      }
-
-      /* 🔹 Botão X fechar */
-      #fechar-painel {
-        position: absolute;
-        right: 15px;
-        top: 15px;
-        font-size: 26px;
-        cursor: pointer;
-        color: #fff;
-      }
-
-      /* 🔹 Alinhar texto à direita (implementação solicitada) */
-      #texto-vinho {
-        text-align: right;
-      }
-
-#track-message {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.7);
-  color: #f7db73;
- font-family: 'Changa One', sans-serif;
-  font-size: 1em;
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-align: center;
-  text-shadow: 2px 2px 5px black;
-  z-index: 9999;
-}
-
-    </style>
-
   </head>
   <body>
-    
-    <!-- 🔹 Mensagem de foco no track -->
-    <div id="track-message">
-      Aponte a câmera para o cartão!
-    </div>
-
-    
-    <!-- 🎵 Áudios -->
-    <audio id="dialogo" src="Audios/.mp3"></audio>
-   
-
-    <!-- Cena AR -->
-    <a-scene mindar-image="imageTargetSrc: Imagens/targets.mind; filterMinCF: 0.0001; 
-              filterBeta: 0.05;
-              missTolerance: 5;
-              warmupTolerance: 4;" 
-             color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights" 
-             xr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false">
-
-      <!-- Assets: imagens do cartão e dos ícones + modelo glTF (placeholder) -->
+    <a-scene mindar-image="imageTargetSrc: Imagens/targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       <a-assets>
-        <!-- Substitua os src pelos seus arquivos reais -->
-        <img id="cardImg" src="Imagens/Cartao.jpg" crossorigin="anonymous" />
-        <img id="instaIcon" src="Imagens/btn_Instagram.png" crossorigin="anonymous" />
-        <img id="fbIcon" src="Imagens/btn_facebook.png" crossorigin="anonymous" />
-        <img id="waIcon" src="Imagens/btn_Whatsapp.png" crossorigin="anonymous" />
-        <img id="audioIcon" src="Imagens/btn_Audio.png" crossorigin="anonymous" />
-
-        <!-- Modelo glTF de exemplo - substitua por um modelo de casa real -->
-        <a-asset-item id="houseModel" src="Modelos/Casa.glb"></a-asset-item>
+        <img id="card" src="Imagens/Cartao.jpg" />
+        <!-- Ícones das redes (adicione seus arquivos aqui) -->
+        <img id="instaIcon" src="Imagens/btn_Instagram.png">
+        <img id="faceIcon" src="Imagens/btn_Facebook.png">
+        <img id="whatsIcon" src="Imagens/btn_Whatsapp.png">      
+        <a-asset-item id="avatarModel" src="Modelos/Casa.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane src="#card" position="0 0 0" height="0.552" width="1" rotation="0 0 0"></a-plane>
+        <a-gltf-model rotation="90 0 0" position="-0.01528 0.53369 0.05421" scale="0.08 0.08 0.08" src="#avatarModel" gltf-model="Modelos/Casa.glb"></a-gltf-model>
+     
+      
+      <!-- BOTÕES DE REDES SOCIAIS COMO BUTTONS COM IMAGENS -->
+        <a-image src="#instaIcon" position="-0.37193 -0.43656 0.03978" width="0.22" height="0.22" open-insta="" class="clickable">
+        </a-image>
 
-       <!-- Casa 3D acima do cartão -->
-        <a-entity id="houseEntity"
-                  gltf-model="#houseModel"
-                  position="0 0.45 0"
-                  rotation="0 180 0"
-                  scale="0.25 0.25 0.25"
-                  animation__pop="property: scale; to: 0.28 0.28 0.28; dur: 800; dir: alternate; loop: true; easing: easeInOutSine">
-        </a-entity>
+        <a-image sr="#faceIcon" position="0.11 -0.45 0.05" width="0.22" height="0.22" open-face="" class="clickable">
+        </a-image>
 
-        <!-- Ícones das redes sociais abaixo do cartão (cada um é um plano clicável) -->
-        <a-entity id="socials" position="0 -0.6 0">
-
-          <a-plane id="insta" class="socialIcon" position="-0.5 0 0"
-                   width="0.3" height="0.3" rotation="-90 0 0"
-                   material="shader: flat; src: #instaIcon; transparent: true">
-          </a-plane>
-
-          <a-plane id="facebook" class="socialIcon" position="0 0 0"
-                   width="0.3" height="0.3" rotation="-90 0 0"
-                   material="shader: flat; src: #fbIcon; transparent: true">
-          </a-plane>
-
-          <a-plane id="whatsapp" class="socialIcon" position="0.5 0 0"
-                   width="0.3" height="0.3" rotation="-90 0 0"
-                   material="shader: flat; src: #waIcon; transparent: true">
-          </a-plane>
-
-        </a-entity>   
-
-</a-scene>
-  
-
+        <a-image src="#whatsIcon"
+                 position="0.35 -0.45 0.05"
+                 width="0.22" height="0.22"
+                 open-whats
+                 class="clickable">
+        </a-image>
+ </a-entity>
+      
+    </a-scene>
   </body>
 </html>
