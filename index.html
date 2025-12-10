@@ -6,6 +6,20 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <script>
+      // Funções dos botões
+      AFRAME.registerComponent('open-insta', {
+        init() { this.el.addEventListener('click', () => window.open("https://instagram.com", "_blank")); }
+      });
+      AFRAME.registerComponent('open-face', {
+        init() { this.el.addEventListener('click', () => window.open("https://facebook.com", "_blank")); }
+      });
+      AFRAME.registerComponent('open-whats', {
+        init() { this.el.addEventListener('click', () => window.open("https://wa.me/000000000", "_blank")); }
+      });
+    </script>
+    
   </head>
   <body>
     <a-scene mindar-image="imageTargetSrc: Imagens/targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
@@ -29,7 +43,7 @@
         <a-image src="#instaIcon" position="-0.37193 -0.43656 0.03978" width="0.22" height="0.22" open-insta="" class="clickable">
         </a-image>
 
-        <a-image sr="#faceIcon" position="0.11 -0.45 0.05" width="0.22" height="0.22" open-face="" class="clickable">
+        <a-image  sr="#faceIcon" position="-0.02081 -0.45525 0.04643" width="0.22" height="0.22" open-face="" class="clickable">
         </a-image>
 
         <a-image src="#whatsIcon"
