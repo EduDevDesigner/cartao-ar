@@ -45,6 +45,8 @@ window.addEventListener("DOMContentLoaded", () => {
         if (obj.hasAttribute("open-whats")) {
           window.location.href = "https://wa.me/000000000";
         }
+        
+        //CONTRILE AUDIO
         if (obj.hasAttribute("open-audio")) {
             const audio = document.getElementById("audioVoz");
             audio.currentTime = 0;
@@ -68,19 +70,6 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-
-<style>
-  /* Animação de pulsação */
-  .pulsando {
-    animation: pulse 0.8s infinite ease-in-out;
-  }
-
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.18); }
-    100% { transform: scale(1); }
-  }
-</style>
 
     
   </head>
