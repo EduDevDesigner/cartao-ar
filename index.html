@@ -45,21 +45,11 @@ window.addEventListener("DOMContentLoaded", () => {
         if (obj.hasAttribute("open-whats")) {
           window.location.href = "https://wa.me/000000000";
         }
-        //SCRIPT DO AUDIO 
         if (obj.hasAttribute("open-audio")) {
-          const audio = document.getElementById("audioVoz");
-          const btnAudio = obj; // referência ao botão clicado
-
-          audio.currentTime = 0;
-          audio.play();
-
-          btnAudio.classList.add("pulsando");
-
-         // Remove a animação quando parar
-         audio.onended = () => {
-          btnAudio.classList.remove("pulsando");
-       };
-      }
+            const audio = document.getElementById("audioVoz");
+            audio.currentTime = 0;
+            audio.play();
+        }
 
       }
     }
@@ -78,6 +68,19 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+
+<style>
+  /* Animação de pulsação */
+  .pulsando {
+    animation: pulse 0.8s infinite ease-in-out;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+</style>
 
     
   </head>
