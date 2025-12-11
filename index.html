@@ -8,64 +8,64 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <script>
-  // registro robusto de componentes (substitua seu script atual por este)
-  (function(){
-    function safeOpen(url) {
-      // tenta abrir em nova aba (user gesture costuma permitir); se falhar, altera location
-      try {
-        const newWin = window.open(url, '_blank');
-        if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
-          // popup bloqueado -> navega no mesmo tab
-          window.location.href = url;
+window.addEventListener("DOMContentLoaded", () => {
+
+  const scene = document.querySelector("a-scene");
+
+  // Espera o MindAR iniciar
+  scene.addEventListener("renderstart", () => {
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const camera = scene.camera;
+
+    function checkHit(x, y) {
+      // Normaliza coordenadas
+      mouse.x = (x / window.innerWidth) * 2 - 1;
+      mouse.y = -(y / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+
+      const clickable = Array.from(document.querySelectorAll(".clickable"))
+        .map(el => el.object3D);
+
+      const intersects = raycaster.intersectObjects(clickable, true);
+
+      if (intersects.length > 0) {
+        const obj = intersects[0].object.el;
+
+        if (!obj) return;
+
+        if (obj.hasAttribute("open-insta")) {
+          window.location.href = "https://instagram.com";
         }
-      } catch (e) {
-        window.location.href = url;
+        if (obj.hasAttribute("open-face")) {
+          window.location.href = "https://facebook.com";
+        }
+        if (obj.hasAttribute("open-whats")) {
+          window.location.href = "https://wa.me/000000000";
+        }
+        if (obj.hasAttribute("open-audio")) {
+          alert("Clique no botão de áudio!");
+        }
       }
     }
 
-    AFRAME.registerComponent('open-insta', {
-      init() {
-        const fn = (ev) => { ev.preventDefault && ev.preventDefault(); safeOpen('https://instagram.com'); };
-        this.el.addEventListener('click', fn);
-        this.el.addEventListener('touchstart', fn);
-        this.el.addEventListener('mousedown', fn);
-      }
+    // Evento de toque na tela (mobile)
+    window.addEventListener("touchstart", e => {
+      const t = e.touches[0];
+      checkHit(t.clientX, t.clientY);
     });
 
-    AFRAME.registerComponent('open-face', {
-      init() {
-        const fn = (ev) => { ev.preventDefault && ev.preventDefault(); safeOpen('https://facebook.com'); };
-        this.el.addEventListener('click', fn);
-        this.el.addEventListener('touchstart', fn);
-        this.el.addEventListener('mousedown', fn);
-      }
+    // Evento de clique (desktop)
+    window.addEventListener("mousedown", e => {
+      checkHit(e.clientX, e.clientY);
     });
 
-    AFRAME.registerComponent('open-whats', {
-      init() {
-        const fn = (ev) => { ev.preventDefault && ev.preventDefault(); safeOpen('https://wa.me/000000000'); };
-        this.el.addEventListener('click', fn);
-        this.el.addEventListener('touchstart', fn);
-        this.el.addEventListener('mousedown', fn);
-      }
-    });
-
-    // se quiser implementar o botão de áudio também (exemplo)
-    AFRAME.registerComponent('open-audio', {
-      init() {
-        const fn = (ev) => {
-          ev.preventDefault && ev.preventDefault();
-          // exemplo simples: disparar evento customizado para tocar áudio (implemente conforme seu código)
-          window.dispatchEvent(new CustomEvent('play-audio'));
-        };
-        this.el.addEventListener('click', fn);
-        this.el.addEventListener('touchstart', fn);
-        this.el.addEventListener('mousedown', fn);
-      }
-    });
-
-  })();
+  });
+});
 </script>
+
 
     
   </head>
