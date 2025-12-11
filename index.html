@@ -45,9 +45,22 @@ window.addEventListener("DOMContentLoaded", () => {
         if (obj.hasAttribute("open-whats")) {
           window.location.href = "https://wa.me/000000000";
         }
+        //SCRIPT DO AUDIO 
         if (obj.hasAttribute("open-audio")) {
-          alert("Clique no botão de áudio!");
-        }
+          const audio = document.getElementById("audioVoz");
+          const btnAudio = obj; // referência ao botão clicado
+
+          audio.currentTime = 0;
+          audio.play();
+
+          btnAudio.classList.add("pulsando");
+
+         // Remove a animação quando parar
+         audio.onended = () => {
+          btnAudio.classList.remove("pulsando");
+       };
+      }
+
       }
     }
 
@@ -66,7 +79,6 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-
     
   </head>
   <body>
@@ -77,7 +89,8 @@ window.addEventListener("DOMContentLoaded", () => {
         <img id="instaIcon" src="Imagens/btn_Instagram.png">
         <img id="faceIcon" src="Imagens/btn_Facebook.png">
         <img id="whatsIcon" src="Imagens/btn_Whatsapp.png">
-        <img id="audioIcon" src="Imagens/btn_Audio.png">  
+        <img id="audioIcon" src="Imagens/btn_Audio.png">
+        <audio id="audioVoz" src="Audios/Dialogo_Cartao.mp3"></audio>
         <a-asset-item id="avatarModel" src="Modelos/Casa.glb"></a-asset-item>
       </a-assets>
 
