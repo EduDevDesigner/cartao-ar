@@ -4,14 +4,18 @@
     <title></title>   
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="style.css">
+
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    
+
 <script>
 window.addEventListener("DOMContentLoaded", () => {
 
   const scene = document.querySelector("a-scene");
+
   let ambientAudio = null;
+  let avatar = null;
+  const originalScale = "0.15505 0.15505 0.15505";
 
   scene.addEventListener("renderstart", () => {
 
@@ -20,49 +24,93 @@ window.addEventListener("DOMContentLoaded", () => {
     const camera = scene.camera;
 
     const target = document.querySelector("[mindar-image-target]");
-    const avatar = document.getElementById("avatarModelEntity");
+    avatar = document.querySelector("#avatar");
+    const buttons = document.querySelectorAll(".clickable");
 
-    // 🔹 ANIMAÇÕES AO ENCONTRAR O TARGET
+    // 🔹 SALVA POSIÇÃO FINAL ORIGINAL (UMA VEZ)
+    buttons.forEach(btn => {
+      const pos = btn.getAttribute("position");
+      btn.dataset.finalX = pos.x;
+      btn.dataset.finalY = pos.y;
+      btn.dataset.finalZ = pos.z;
+
+      // começa sempre atrás
+      btn.object3D.position.z = -0.25;
+    });
+
+    // ============================
+    // TARGET FOUND
+    // ============================
     target.addEventListener("targetFound", () => {
 
-      // 🔸 BOTÕES SAINDO DE TRÁS DO CARTÃO
-      document.querySelectorAll(".clickable").forEach((btn, index) => {
+      /* ---------- BOTÕES ---------- */
+      buttons.forEach((btn, index) => {
+
+        btn.removeAttribute("animation__enter");
+
+        // garante que começa atrás
+        btn.object3D.position.z = -0.25;
+
         btn.setAttribute("animation__enter", {
           property: "position",
-          from: `${btn.object3D.position.x} ${btn.object3D.position.y} -0.25`,
-          to: `${btn.object3D.position.x} ${btn.object3D.position.y} ${btn.object3D.position.z}`,
-          dur: 1000,
+          from: `${btn.dataset.finalX} ${btn.dataset.finalY} -0.25`,
+          to: `${btn.dataset.finalX} ${btn.dataset.finalY} ${btn.dataset.finalZ}`,
+          dur: 900,
           delay: index * 120,
           easing: "easeOutBack"
         });
       });
 
-      // 🔸 SQUASH & STRETCH DO AVATAR
+      /* ---------- AVATAR (SQUASH & STRETCH) ---------- */
+      avatar.removeAttribute("animation__squash");
+      avatar.removeAttribute("animation__stretch");
+
       avatar.setAttribute("scale", "0.15505 0.01 0.15505");
 
       avatar.setAttribute("animation__squash", {
         property: "scale",
         to: "0.18 0.05 0.18",
-        dur: 800,
+        dur: 250,
         easing: "easeOutQuad"
       });
 
       avatar.setAttribute("animation__stretch", {
         property: "scale",
         from: "0.18 0.05 0.18",
-        to: "0.15505 0.15505 0.15505",
-        dur: 400,
-        delay: 300,
+        to: originalScale,
+        dur: 450,
+        delay: 250,
         easing: "easeOutElastic"
       });
 
-      // 🔸 ÁUDIO AMBIENTE
+      /* ---------- ÁUDIO ---------- */
       ambientAudio = document.getElementById("audioAmbiente");
       ambientAudio.volume = 0.10;
       ambientAudio.loop = true;
       ambientAudio.play();
     });
 
+    // ============================
+    // TARGET LOST
+    // ============================
+    target.addEventListener("targetLost", () => {
+
+      avatar.setAttribute("scale", originalScale);
+
+      buttons.forEach(btn => {
+        btn.object3D.position.z = -0.25;
+        btn.removeAttribute("animation__enter");
+      });
+
+      if (ambientAudio) {
+        ambientAudio.pause();
+        ambientAudio.currentTime = 0;
+      }
+    });
+
+    // ============================
+    // CLIQUES / TOQUES
+    // ============================
     function checkHit(x, y) {
       mouse.x = (x / window.innerWidth) * 2 - 1;
       mouse.y = -(y / window.innerHeight) * 2 + 1;
@@ -76,18 +124,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
       if (intersects.length > 0) {
         const obj = intersects[0].object.el;
-
         if (!obj) return;
 
-        if (obj.hasAttribute("open-insta")) {
-          window.location.href = "https://instagram.com";
-        }
-        if (obj.hasAttribute("open-face")) {
-          window.location.href = "https://facebook.com";
-        }
-        if (obj.hasAttribute("open-whats")) {
-          window.location.href = "https://wa.me/000000000";
-        }
+        if (obj.hasAttribute("open-insta")) window.location.href = "https://instagram.com";
+        if (obj.hasAttribute("open-face")) window.location.href = "https://facebook.com";
+        if (obj.hasAttribute("open-whats")) window.location.href = "https://wa.me/000000000";
         if (obj.hasAttribute("open-audio")) {
           const audio = document.getElementById("audioVoz");
           audio.currentTime = 0;
@@ -108,18 +149,18 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-    
   </head>
 
   <body>
-    <a-scene mindar-image="imageTargetSrc: Imagens/targets.mind;" 
-             color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights" 
-             vr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false">
+    <a-scene
+      mindar-image="imageTargetSrc: Imagens/targets.mind;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false">
 
       <a-assets>
-        <img id="card" src="Imagens/Cartao.jpg" />
+        <img id="card" src="Imagens/Cartao.jpg">
         <img id="instaIcon" src="Imagens/btn_Instagram.png">
         <img id="faceIcon" src="Imagens/btn_Facebook.png">
         <img id="whatsIcon" src="Imagens/btn_Whatsapp.png">
@@ -134,19 +175,19 @@ window.addEventListener("DOMContentLoaded", () => {
       <a-camera position="0 0 0" look-controls="enabled: false">
         <a-cursor rayOrigin="mouse"></a-cursor>
       </a-camera>
-      
+
       <a-entity mindar-image-target="targetIndex: 0">
 
         <a-plane src="#card" position="0 0 0" height="0.552" width="1"></a-plane>
 
-        <!-- AVATAR COM ID PARA ANIMAÇÃO -->
-        <a-gltf-model id="avatarModelEntity"
-                      rotation="90 0 0"
-                      position="0.03401 0.79708 0.05371"
-                      scale="0.15505 0.15505 0.15505"
-                      src="#avatarModel"></a-gltf-model>
+        <a-gltf-model
+          id="avatar"
+          src="#avatarModel"
+          rotation="90 0 0"
+          position="0.03401 0.79708 0.05371"
+          scale="0.15505 0.15505 0.15505">
+        </a-gltf-model>
 
-        <!-- BOTÕES -->
         <a-image src="#instaIcon" position="-0.37193 -0.43656 0.03978"
                  width="0.22" height="0.22"
                  open-insta class="clickable"></a-image>
@@ -164,7 +205,7 @@ window.addEventListener("DOMContentLoaded", () => {
                  open-audio class="clickable"></a-image>
 
       </a-entity>
-      
+
     </a-scene>
   </body>
 </html>
