@@ -7,12 +7,10 @@
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
-    <script>
+<script>
 window.addEventListener("DOMContentLoaded", () => {
 
   const scene = document.querySelector("a-scene");
-
-  // --- NOVO AUDIO EM LOOP (COMEÇA AO DETECTAR TARGET) ---
   let ambientAudio = null;
 
   scene.addEventListener("renderstart", () => {
@@ -21,11 +19,46 @@ window.addEventListener("DOMContentLoaded", () => {
     const mouse = new THREE.Vector2();
     const camera = scene.camera;
 
-    // Quando o target aparecer
     const target = document.querySelector("[mindar-image-target]");
+    const avatar = document.getElementById("avatarModelEntity");
+
+    // 🔹 ANIMAÇÕES AO ENCONTRAR O TARGET
     target.addEventListener("targetFound", () => {
+
+      // 🔸 BOTÕES SAINDO DE TRÁS DO CARTÃO
+      document.querySelectorAll(".clickable").forEach((btn, index) => {
+        btn.setAttribute("animation__enter", {
+          property: "position",
+          from: `${btn.object3D.position.x} ${btn.object3D.position.y} -0.25`,
+          to: `${btn.object3D.position.x} ${btn.object3D.position.y} ${btn.object3D.position.z}`,
+          dur: 1000,
+          delay: index * 120,
+          easing: "easeOutBack"
+        });
+      });
+
+      // 🔸 SQUASH & STRETCH DO AVATAR
+      avatar.setAttribute("scale", "0.15505 0.01 0.15505");
+
+      avatar.setAttribute("animation__squash", {
+        property: "scale",
+        to: "0.18 0.05 0.18",
+        dur: 800,
+        easing: "easeOutQuad"
+      });
+
+      avatar.setAttribute("animation__stretch", {
+        property: "scale",
+        from: "0.18 0.05 0.18",
+        to: "0.15505 0.15505 0.15505",
+        dur: 400,
+        delay: 300,
+        easing: "easeOutElastic"
+      });
+
+      // 🔸 ÁUDIO AMBIENTE
       ambientAudio = document.getElementById("audioAmbiente");
-      ambientAudio.volume = 0.10;   // volume mais baixo
+      ambientAudio.volume = 0.10;
       ambientAudio.loop = true;
       ambientAudio.play();
     });
@@ -55,14 +88,11 @@ window.addEventListener("DOMContentLoaded", () => {
         if (obj.hasAttribute("open-whats")) {
           window.location.href = "https://wa.me/000000000";
         }
-        
-        //CONTROLE AUDIO PRINCIPAL
         if (obj.hasAttribute("open-audio")) {
-            const audio = document.getElementById("audioVoz");
-            audio.currentTime = 0;
-            audio.play();
+          const audio = document.getElementById("audioVoz");
+          audio.currentTime = 0;
+          audio.play();
         }
-
       }
     }
 
@@ -78,41 +108,61 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-
     
   </head>
+
   <body>
-    <a-scene mindar-image="imageTargetSrc: Imagens/targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-scene mindar-image="imageTargetSrc: Imagens/targets.mind;" 
+             color-space="sRGB" 
+             renderer="colorManagement: true, physicallyCorrectLights" 
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
+
       <a-assets>
         <img id="card" src="Imagens/Cartao.jpg" />
-        <!-- Ícones das redes (adicione seus arquivos aqui) -->
         <img id="instaIcon" src="Imagens/btn_Instagram.png">
         <img id="faceIcon" src="Imagens/btn_Facebook.png">
         <img id="whatsIcon" src="Imagens/btn_Whatsapp.png">
         <img id="audioIcon" src="Imagens/btn_Audio.png">
 
         <audio id="audioVoz" src="Audios/Dialogo_Cartao.mp3"></audio>
-
-        <!-- NOVO AUDIO EM LOOP (VOLUME BAIXO) -->
         <audio id="audioAmbiente" src="Audios/baroque-194637.mp3"></audio>
 
         <a-asset-item id="avatarModel" src="Modelos/Casa.glb"></a-asset-item>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"><a-cursor rayOrigin="mouse"></a-cursor></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false">
+        <a-cursor rayOrigin="mouse"></a-cursor>
+      </a-camera>
       
       <a-entity mindar-image-target="targetIndex: 0">
-        <a-plane src="#card" position="0 0 0" height="0.552" width="1" rotation="0 0 0"></a-plane>
-        <a-gltf-model rotation="90 0 0" position="0.03401 0.79708 0.05371" scale="0.15505 0.15505 0.15505" src="#avatarModel" gltf-model="Modelos/Casa.glb"></a-gltf-model>
-      
-      <!-- BOTÕES DE REDES SOCIAIS -->
-        <a-image src="#instaIcon" position="-0.37193 -0.43656 0.03978" width="0.22" height="0.22" open-insta="" class="clickable"></a-image>
 
-        <a-image src="#faceIcon" position="-0.02081 -0.45525 0.04643" width="0.22" height="0.22" open-face="" class="clickable"></a-image>
+        <a-plane src="#card" position="0 0 0" height="0.552" width="1"></a-plane>
 
-        <a-image src="#whatsIcon" position="0.35 -0.45 0.05" width="0.22" height="0.22" open-whats="" class="clickable"></a-image>
-        
-        <a-image src="#audioIcon" position="0.67131 -0.027 0.02927" width="0.22" height="0.22" open-audio="" class="clickable"></a-image>
+        <!-- AVATAR COM ID PARA ANIMAÇÃO -->
+        <a-gltf-model id="avatarModelEntity"
+                      rotation="90 0 0"
+                      position="0.03401 0.79708 0.05371"
+                      scale="0.15505 0.15505 0.15505"
+                      src="#avatarModel"></a-gltf-model>
+
+        <!-- BOTÕES -->
+        <a-image src="#instaIcon" position="-0.37193 -0.43656 0.03978"
+                 width="0.22" height="0.22"
+                 open-insta class="clickable"></a-image>
+
+        <a-image src="#faceIcon" position="-0.02081 -0.45525 0.04643"
+                 width="0.22" height="0.22"
+                 open-face class="clickable"></a-image>
+
+        <a-image src="#whatsIcon" position="0.35 -0.45 0.05"
+                 width="0.22" height="0.22"
+                 open-whats class="clickable"></a-image>
+
+        <a-image src="#audioIcon" position="0.67131 -0.027 0.02927"
+                 width="0.22" height="0.22"
+                 open-audio class="clickable"></a-image>
+
       </a-entity>
       
     </a-scene>
