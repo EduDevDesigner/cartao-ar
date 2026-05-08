@@ -27,6 +27,10 @@ window.addEventListener("DOMContentLoaded", () => {
     avatar = document.querySelector("#avatar");
     const buttons = document.querySelectorAll(".clickable");
 
+    // VIDEO
+    const videoPlane = document.querySelector("#videoPlane");
+    const videoElement = document.querySelector("#videoQuadrado");
+
     // 🔹 SALVA POSIÇÃO FINAL ORIGINAL (UMA VEZ)
     buttons.forEach(btn => {
       const pos = btn.getAttribute("position");
@@ -102,6 +106,11 @@ window.addEventListener("DOMContentLoaded", () => {
         btn.removeAttribute("animation__enter");
       });
 
+      // ESCONDE O VIDEO
+      videoPlane.setAttribute("visible", false);
+      videoElement.pause();
+      videoElement.currentTime = 0;
+
       if (ambientAudio) {
         ambientAudio.pause();
         ambientAudio.currentTime = 0;
@@ -129,10 +138,19 @@ window.addEventListener("DOMContentLoaded", () => {
         if (obj.hasAttribute("open-insta")) window.location.href = "https://instagram.com";
         if (obj.hasAttribute("open-face")) window.location.href = "https://facebook.com";
         if (obj.hasAttribute("open-whats")) window.location.href = "https://wa.me/000000000";
+
         if (obj.hasAttribute("open-audio")) {
+
           const audio = document.getElementById("audioVoz");
           audio.currentTime = 0;
           audio.play();
+
+          // MOSTRA VIDEO
+          videoPlane.setAttribute("visible", true);
+
+          // TOCA VIDEO
+          videoElement.currentTime = 0;
+          videoElement.play();
         }
       }
     }
@@ -169,6 +187,11 @@ window.addEventListener("DOMContentLoaded", () => {
         <audio id="audioVoz" src="Audios/Dialogo_Cartao.mp3"></audio>
         <audio id="audioAmbiente" src="Audios/baroque-194637.mp3"></audio>
 
+        <!-- VIDEO 1:1 -->
+        <video
+          id="videoQuadrado" src="Videos/Marta%20Arquitetura.mp4" preload="auto" playsinline webkit-playsinline crossorigin="anonymous">
+        </video>
+
         <a-asset-item id="avatarModel" src="Modelos/Casa.glb"></a-asset-item>
       </a-assets>
 
@@ -187,6 +210,11 @@ window.addEventListener("DOMContentLoaded", () => {
           position="0.03401 0.79708 0.05371"
           scale="0.15505 0.15505 0.15505">
         </a-gltf-model>
+
+        <!-- VIDEO 1:1 -->
+        <a-video
+          id="videoPlane" src="#videoQuadrado" position="0 0.15 0.05" width="0.45" height="0.45"  visible="false">
+        </a-video>
 
         <a-image src="#instaIcon" position="-0.37193 -0.43656 0.03978"
                  width="0.22" height="0.22"
