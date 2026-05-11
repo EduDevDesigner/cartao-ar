@@ -31,6 +31,12 @@ window.addEventListener("DOMContentLoaded", () => {
     const videoPlane = document.querySelector("#videoPlane");
     const videoElement = document.querySelector("#videoQuadrado");
 
+    // 🔹 QUANDO O VIDEO TERMINAR
+    videoElement.addEventListener("ended", () => {
+      videoPlane.setAttribute("visible", false);
+      videoElement.currentTime = 0;
+    });
+
     // 🔹 SALVA POSIÇÃO FINAL ORIGINAL (UMA VEZ)
     buttons.forEach(btn => {
       const pos = btn.getAttribute("position");
@@ -141,12 +147,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (obj.hasAttribute("open-audio")) {
 
-          
+          const audio = document.getElementById("audioVoz");
+          audio.currentTime = 0;
+          audio.play();
 
           // MOSTRA VIDEO
           videoPlane.setAttribute("visible", true);
 
-          // TOCA VIDEO
+          // REINICIA E TOCA VIDEO
+          videoElement.pause();
           videoElement.currentTime = 0;
           videoElement.play();
         }
@@ -182,12 +191,17 @@ window.addEventListener("DOMContentLoaded", () => {
         <img id="whatsIcon" src="Imagens/btn_Whatsapp.png">
         <img id="audioIcon" src="Imagens/btn_Audio.png">
 
-        <!-- <audio id="audioVoz" src="Audios/Dialogo_Cartao.mp3"></audio> -->
+        <audio id="audioVoz" src="Audios/Dialogo_Cartao.mp3"></audio>
         <audio id="audioAmbiente" src="Audios/baroque-194637.mp3"></audio>
 
         <!-- VIDEO 1:1 -->
         <video
-          id="videoQuadrado" src="Videos/Marta_Arquitetura.mp4" preload="auto" playsinline webkit-playsinline crossorigin="anonymous">
+          id="videoQuadrado"
+          src="Videos/video.mp4"
+          preload="auto"
+          playsinline
+          webkit-playsinline
+          crossorigin="anonymous">
         </video>
 
         <a-asset-item id="avatarModel" src="Modelos/Casa.glb"></a-asset-item>
@@ -211,7 +225,12 @@ window.addEventListener("DOMContentLoaded", () => {
 
         <!-- VIDEO 1:1 -->
         <a-video
-          id="videoPlane" src="#videoQuadrado" position="-0.33 0.13 0.01" width="0.25" height="0.25"  visible="false">
+          id="videoPlane"
+          src="#videoQuadrado"
+          position="0 0.15 0.05"
+          width="0.45"
+          height="0.45"
+          visible="false">
         </a-video>
 
         <a-image src="#instaIcon" position="-0.37193 -0.43656 0.03978"
