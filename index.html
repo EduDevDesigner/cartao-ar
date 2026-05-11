@@ -31,10 +31,28 @@ window.addEventListener("DOMContentLoaded", () => {
     const videoPlane = document.querySelector("#videoPlane");
     const videoElement = document.querySelector("#videoQuadrado");
 
+    // 🔹 CONTROLE PARA EVITAR DUPLO PLAY
+    let videoPlaying = false;
+
     // 🔹 QUANDO O VIDEO TERMINAR
     videoElement.addEventListener("ended", () => {
-      videoPlane.setAttribute("visible", false);
-      videoElement.currentTime = 0;
+
+      // FADE OUT
+      videoPlane.removeAttribute("animation__fadein");
+
+      videoPlane.setAttribute("animation__fadeout", {
+        property: "material.opacity",
+        from: 1,
+        to: 0,
+        dur: 700,
+        easing: "linear"
+      });
+
+      setTimeout(() => {
+        videoPlane.setAttribute("visible", false);
+        videoElement.currentTime = 0;
+        videoPlaying = false;
+      }, 700);
     });
 
     // 🔹 SALVA POSIÇÃO FINAL ORIGINAL (UMA VEZ)
@@ -114,8 +132,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
       // ESCONDE O VIDEO
       videoPlane.setAttribute("visible", false);
+      videoPlane.setAttribute("material", "opacity: 0");
+
       videoElement.pause();
       videoElement.currentTime = 0;
+      videoPlaying = false;
 
       if (ambientAudio) {
         ambientAudio.pause();
@@ -127,6 +148,10 @@ window.addEventListener("DOMContentLoaded", () => {
     // CLIQUES / TOQUES
     // ============================
     function checkHit(x, y) {
+
+      // EVITA DUPLO DISPARO touch + mouse
+      if (videoPlaying) return;
+
       mouse.x = (x / window.innerWidth) * 2 - 1;
       mouse.y = -(y / window.innerHeight) * 2 + 1;
 
@@ -147,6 +172,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (obj.hasAttribute("open-audio")) {
 
+          videoPlaying = true;
+
           const audio = document.getElementById("audioVoz");
           audio.currentTime = 0;
           audio.play();
@@ -154,19 +181,43 @@ window.addEventListener("DOMContentLoaded", () => {
           // MOSTRA VIDEO
           videoPlane.setAttribute("visible", true);
 
+          // OPACIDADE INICIAL
+          videoPlane.setAttribute("material", "opacity: 0");
+
+          // FADE IN
+          videoPlane.removeAttribute("animation__fadeout");
+
+          videoPlane.setAttribute("animation__fadein", {
+            property: "material.opacity",
+            from: 0,
+            to: 1,
+            dur: 700,
+            easing: "linear"
+          });
+
           // REINICIA E TOCA VIDEO
           videoElement.pause();
           videoElement.currentTime = 0;
-          videoElement.play();
+
+          const playPromise = videoElement.play();
+
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              videoPlaying = false;
+            });
+          }
         }
       }
     }
 
+    // TOUCH
     window.addEventListener("touchstart", e => {
+      e.preventDefault();
       const t = e.touches[0];
       checkHit(t.clientX, t.clientY);
-    });
+    }, { passive: false });
 
+    // MOUSE
     window.addEventListener("mousedown", e => {
       checkHit(e.clientX, e.clientY);
     });
@@ -191,13 +242,13 @@ window.addEventListener("DOMContentLoaded", () => {
         <img id="whatsIcon" src="Imagens/btn_Whatsapp.png">
         <img id="audioIcon" src="Imagens/btn_Audio.png">
 
-        <audio id="audioVoz" src="Audios/Dialogo_Cartao.mp3"></audio>
+        <audio id="audioVoz" src="Audios/"></audio>
         <audio id="audioAmbiente" src="Audios/baroque-194637.mp3"></audio>
 
         <!-- VIDEO 1:1 -->
         <video
           id="videoQuadrado"
-          src="Videos/video.mp4"
+          src="Videos/Marta_Arquitetura.mp4"
           preload="auto"
           playsinline
           webkit-playsinline
@@ -227,10 +278,11 @@ window.addEventListener("DOMContentLoaded", () => {
         <a-video
           id="videoPlane"
           src="#videoQuadrado"
-          position="0 0.15 0.05"
-          width="0.45"
-          height="0.45"
-          visible="false">
+          position="-0.33 0.13 0.01"
+          width="0.25"
+          height="0.25"
+          visible="false"
+          material="opacity: 0">
         </a-video>
 
         <a-image src="#instaIcon" position="-0.37193 -0.43656 0.03978"
